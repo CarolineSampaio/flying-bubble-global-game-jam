@@ -31,13 +31,14 @@ def draw_text(text, font, color, surface, y_offset=0):
 class Bubble(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((30, 30), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, (173, 216, 230), (15, 15), 15)  # cor azul clara
-        self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 2 // 3))  # posicao no 1/3 inferior
-        self.fixed_position = True  # a bolha comeca fixa no 1/3 inferior
+        # Carregar a imagem da bolha
+        self.image = pygame.image.load("gallery/sprites/bubble.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30, 30))  # Redimensionar para 30x30 pixels
+        self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 2 // 3))  # posição no 1/3 inferior
+        self.fixed_position = True  # a bolha começa fixa no 1/3 inferior
 
     def update(self):
-        # controles laterais
+        # Controles laterais
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.left > 0:
             self.rect.x -= 5
