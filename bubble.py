@@ -4,6 +4,9 @@ import random
 # inicializacao do pygame
 pygame.init()
 
+# inicializar o sistema de áudio
+pygame.mixer.init()
+
 # configuracoes da tela
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 700  # aumentei a altura da tela
@@ -131,6 +134,9 @@ def start_screen():
     draw_text("Bubble Fly", font, WHITE, screen)
     draw_text("Pressione Espaço para Jogar", font, WHITE, screen, 50)
 
+# carregar o áudio
+pygame.mixer.music.load("gallery/audio/flying.mp3")
+
 # jogo principal
 running = True
 game_state = 'start'  # pode ser 'start', 'playing', ou 'game_over'
@@ -142,7 +148,12 @@ while running:
 
     if game_state == 'start':
         start_screen()  # tela inicial
+        pygame.mixer.music.stop()  # Para o som no estado inicial
     elif game_state == 'playing':
+        # Tocar o som apenas se ainda não estiver tocando
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.play(-1)  # Reproduzir o som em loop
+
         # atualizacao dos sprites
         bubble.update()  # atualiza apenas a bolha
         obstacles.update(obstacle_speed)  # atualiza os obstaculos com a velocidade
@@ -151,6 +162,7 @@ while running:
         # checagem de colisao com a bolha
         if pygame.sprite.spritecollide(bubble, obstacles, False) and not immunity_time:
             game_state = 'game_over'  # vai para a tela de game over
+            pygame.mixer.music.stop()  # Para o som no game over
 
         # checagem de colisao com a bolinha de imunidade
         if pygame.sprite.spritecollide(bubble, immunity_bubbles, True):
