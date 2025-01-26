@@ -34,14 +34,27 @@ def draw_text(text, font, color, surface, y_offset=0):
 class Bubble(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        # Carregar a imagem da bolha
+        # carrega a imagem da bolha
         self.image = pygame.image.load("gallery/sprites/bubble.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (30, 30))  # Redimensionar para 30x30 pixels
         self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 2 // 3))  # posição no 1/3 inferior
         self.fixed_position = True  # a bolha começa fixa no 1/3 inferior
 
+    def burst(self):
+        # carrega a imagem da bolha estourada
+        self.image = pygame.image.load("gallery/sprites/bubble_burst.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        
+        # animacao de desaparecimento
+        for i in range(255, 0, -5):
+            self.image.set_alpha(i)
+            screen.fill(BLUE)
+            all_sprites.draw(screen)
+            pygame.display.flip()
+            pygame.time.delay(10)
+
     def update(self):
-        # Controles laterais
+        # controles laterais
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.left > 0:
             self.rect.x -= 5
@@ -163,7 +176,9 @@ while running:
 
         # checagem de colisao com a bolha
         if pygame.sprite.spritecollide(bubble, obstacles, False) and not immunity_time:
-            die_sound.play()  # Toca o som de game over
+            die_sound.play() # toca o som de game over
+            bubble.burst() # animacao de estouro
+
             pygame.time.delay(500)
             game_state = 'game_over'  # vai para a tela de game over
             pygame.mixer.music.stop()  # Para o som no game over  
