@@ -53,6 +53,20 @@ class Bubble(pygame.sprite.Sprite):
             pygame.display.flip()
             pygame.time.delay(10)
 
+    def immunity(self):
+        # carrega a imagem da bolha com imunidade
+        self.image = pygame.image.load("gallery/sprites/bubble_immunity.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (35, 35))
+        all_sprites.draw(screen)
+        pygame.display.flip()
+
+    def remove_immunity(self):
+        # carrega a imagem da bolha normal
+        self.image = pygame.image.load("gallery/sprites/bubble.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30, 30))
+        all_sprites.draw(screen)
+        pygame.display.flip()
+
     def update(self):
         # controles laterais
         keys = pygame.key.get_pressed()
@@ -79,8 +93,8 @@ class Obstacle(pygame.sprite.Sprite):
 class ImmunityBubble(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((30, 30), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, (255, 255, 0), (15, 15), 15)  # cor amarela
+        self.image = pygame.image.load("gallery/sprites/immunity.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30, 30))  # redimensionar para 30x30 pixels
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - 30)
         self.rect.y = random.randint(-100, -30)  # inicia fora da tela
@@ -187,6 +201,7 @@ while running:
         if pygame.sprite.spritecollide(bubble, immunity_bubbles, True):
             immunity_time = pygame.time.get_ticks()  # marca o tempo da colisao
             immunity_duration = 10000  # 10 segundos de imunidade
+            bubble.immunity()  # animacao de imunidade
 
         # geracao de obstaculos continua com espacamento
         if random.randint(1, 60) == 1:  # aproximadamente 1 por segundo
@@ -226,6 +241,7 @@ while running:
                 screen.blit(immunity_text, (SCREEN_WIDTH - immunity_text.get_width() - 10, 10))  # exibe o tempo de imunidade
             else:
                 immunity_time = 0  # reinicia a imunidade apos o tempo expirar
+                bubble.remove_immunity()  # remove a imunidade
 
         # desenho dos sprites
         all_sprites.draw(screen)
