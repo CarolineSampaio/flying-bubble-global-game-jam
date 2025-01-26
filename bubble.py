@@ -15,6 +15,7 @@ pygame.display.set_caption("bubble fly")
 
 # cores
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 BLUE = (135, 206, 250)
 DARK_BLUE = (25, 25, 112)
 GREEN = (34, 139, 34)
@@ -189,7 +190,7 @@ while running:
         immunity_bubbles.update()  # atualiza as bolinhas de imunidade
 
         # checagem de colisao com a bolha
-        if pygame.sprite.spritecollide(bubble, obstacles, False) and not immunity_time:
+        if pygame.sprite.spritecollide(bubble, obstacles, False, pygame.sprite.collide_rect_ratio(0.9)) and not immunity_time:  # colisao mais precisa
             die_sound.play() # toca o som de game over
             bubble.burst() # animacao de estouro
 
@@ -208,7 +209,7 @@ while running:
             generate_obstacle()
 
         # geracao de bolinhas de imunidade com menos frequencia
-        if random.randint(1, 1000) == 1:  # diminui ainda mais a chance de aparecer a bolinha de imunidade
+        if random.randint(1, 1000) == 1:  # diminui chance de aparecer a bolinha de imunidade
             immunity_bubble = ImmunityBubble()
             all_sprites.add(immunity_bubble)
             immunity_bubbles.add(immunity_bubble)
@@ -216,29 +217,53 @@ while running:
         # atualizacao da altura
         if bubble.fixed_position:  # atualiza apenas depois que a bolha estiver fixa
             height += scroll_speed
-            if height % 50 == 0:  # a cada 50 metros, aumenta a dificuldade
-                obstacle_speed += 1
-                scroll_speed += 1
+            if int(height) % 50 == 0:  # a cada 50 metros, aumenta a dificuldade
+                obstacle_speed += 0.1
+                generate_obstacle()
 
         # mudanca de cenario com base na altura
         if height < 500:
             screen.fill(BLUE)
         elif height < 1000:
-            screen.fill(DARK_BLUE)
+            # transicao gradual do azul para azul escuro
+            ratio = (height - 500) / 500
+            transition_color = (
+            int(BLUE[0] + (DARK_BLUE[0] - BLUE[0]) * ratio),
+            int(BLUE[1] + (DARK_BLUE[1] - BLUE[1]) * ratio),
+            int(BLUE[2] + (DARK_BLUE[2] - BLUE[2]) * ratio)
+            )
+            screen.fill(transition_color)
         else:
-            screen.fill(WHITE)
+            # transicao gradual do azul escuro para preto
+            ratio = (height - 1000) / 500
+            if ratio < 1:
+                transition_color = (
+                int(DARK_BLUE[0] + (BLACK[0] - DARK_BLUE[0]) * ratio),
+                int(DARK_BLUE[1] + (BLACK[1] - DARK_BLUE[1]) * ratio),
+                int(DARK_BLUE[2] + (BLACK[2] - DARK_BLUE[2]) * ratio)
+                )
+                screen.fill(transition_color)
+            else:
+                screen.fill(BLACK)
 
         # mostrar pontuacao
         font = pygame.font.Font(None, 36)
-        text = font.render(f"altura: {int(height)}m", True, WHITE)  # mostra altura como numero inteiro
+        text = font.render(f"{int(height)}m", True, WHITE)  # mostra altura como numero inteiro
         screen.blit(text, (10, 10))
 
-        # mostrar tempo de imunidade com margem a direita
+        # carrega a imagem do icon de imunidade
+        immunity_icon = pygame.image.load("gallery/sprites/immunity.png").convert_alpha()
+        immunity_icon = pygame.transform.scale(immunity_icon, (25, 25))
+
+        # mostrar tempo de imunidade
         if immunity_time:
             remaining_time = (pygame.time.get_ticks() - immunity_time)
             if remaining_time < immunity_duration:
-                immunity_text = font.render(f'imunidade: {int((immunity_duration - remaining_time) / 1000)}s', True, WHITE)
-                screen.blit(immunity_text, (SCREEN_WIDTH - immunity_text.get_width() - 10, 10))  # exibe o tempo de imunidade
+                immunity_text = font.render(f'{int((immunity_duration - remaining_time) / 1000)}s', True, WHITE)
+                
+                # exibe icone e texto do tempo ao lado
+                screen.blit(immunity_icon, (SCREEN_WIDTH - immunity_icon.get_width() - immunity_text.get_width() - 10, 10))  # icon
+                screen.blit(immunity_text, (SCREEN_WIDTH - immunity_text.get_width() - 10, 10))  # tempo
             else:
                 immunity_time = 0  # reinicia a imunidade apos o tempo expirar
                 bubble.remove_immunity()  # remove a imunidade
@@ -262,7 +287,7 @@ while running:
                 game_state = 'playing'
                 height = 0
                 obstacle_speed = 2  # velocidade intermediaria
-                scroll_speed = 0.1  # mais devagar
+                scroll_speed = 0.3 # mais devagar
                 # limpar obstaculos e bolinhas antigos
                 obstacles.empty()
                 immunity_bubbles.empty()
@@ -276,7 +301,7 @@ while running:
                 game_state = 'playing'
                 height = 0
                 obstacle_speed = 2  # velocidade intermediaria
-                scroll_speed = 0.1  # mais devagar
+                scroll_speed = 0.3  # mais devagar
                 # limpar obstaculos e bolinhas antigos
                 obstacles.empty()
                 immunity_bubbles.empty()
