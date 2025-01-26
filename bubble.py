@@ -136,6 +136,7 @@ def start_screen():
 
 # carregar o áudio
 pygame.mixer.music.load("gallery/audio/flying.mp3")
+die_sound = pygame.mixer.Sound("gallery/audio/die.mp3")  # carregar o som de game over
 
 # jogo principal
 running = True
@@ -161,8 +162,10 @@ while running:
 
         # checagem de colisao com a bolha
         if pygame.sprite.spritecollide(bubble, obstacles, False) and not immunity_time:
+            die_sound.play()  # Toca o som de game over
+            pygame.time.delay(500)
             game_state = 'game_over'  # vai para a tela de game over
-            pygame.mixer.music.stop()  # Para o som no game over
+            pygame.mixer.music.stop()  # Para o som no game over  
 
         # checagem de colisao com a bolinha de imunidade
         if pygame.sprite.spritecollide(bubble, immunity_bubbles, True):
