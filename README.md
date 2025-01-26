@@ -1,5 +1,10 @@
+<div align="center">
 
 # Flying Bubble
+
+![Screenshots do flying bubble game em diversas fases](bubble-game-image.png)
+
+</div>
 
 **Flying Bubble** é um jogo de ação onde o jogador controla uma bolha que deve desviar de obstáculos enquanto sobe pelo cenário. Com gráficos coloridos e animações simples, o jogo oferece desafios crescentes, incluindo booster de imunidade temporário e a necessidade de habilidades rápidas para evitar colisões. Mantenha-se no ar o maior tempo possível e veja até onde você consegue chegar!
 
